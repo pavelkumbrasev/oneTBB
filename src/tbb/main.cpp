@@ -18,6 +18,7 @@
 
 #include "main.h"
 #include "governor.h"
+#include "threading_control.h"
 #include "environment.h"
 #include "market.h"
 #include "misc.h"
@@ -40,9 +41,9 @@ bool governor::UsePrivateRML;
 bool governor::is_rethrow_broken;
 
 //------------------------------------------------------------------------
-// market data
-market* market::theMarket;
-market::global_market_mutex_type market::theMarketMutex;
+// threading_control data
+threading_control* threading_control::g_threading_control;
+threading_control::global_mutex_type threading_control::g_threading_control_mutex;
 
 //------------------------------------------------------------------------
 // context propagation data

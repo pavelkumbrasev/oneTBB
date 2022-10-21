@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2005-2021 Intel Corporation
+    Copyright (c) 2005-2022 Intel Corporation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "oneapi/tbb/detail/_task.h"
 #include "scheduler_common.h"
 #include "arena.h"
+#include "threading_control.h"
 
 namespace tbb {
 namespace detail {
@@ -82,7 +83,7 @@ private:
     using base_type = waiter_base;
 
     bool is_worker_should_leave(arena_slot& slot) const {
-        bool is_top_priority_arena = my_arena.my_is_top_priority.load(std::memory_order_relaxed);
+        bool is_top_priority_arena = my_arena.is_top_priority();
         bool is_task_pool_empty = slot.task_pool.load(std::memory_order_relaxed) == EmptyTaskPool;
 
         if (is_top_priority_arena) {
@@ -110,12 +111,12 @@ protected:
     using waiter_base::waiter_base;
 
     bool is_arena_empty() {
-        return my_arena.my_pool_state.load(std::memory_order_relaxed) == arena::SNAPSHOT_EMPTY;
+        return my_arena.my_pool_state.test() == false;
     }
 
     template <typename Pred>
     void sleep(std::uintptr_t uniq_tag, Pred wakeup_condition) {
-        my_arena.my_market->get_wait_list().wait<market_concurrent_monitor::thread_context>(wakeup_condition,
+        my_arena.get_waiting_threads_monitor().wait<thread_control_monitor::thread_context>(wakeup_condition,
             market_context{uniq_tag, &my_arena});
     }
 };

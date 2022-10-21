@@ -29,6 +29,8 @@ namespace r1 {
 class market;
 class thread_data;
 class __TBB_InitOnce;
+class thread_dispatcher;
+class threading_control_impl;
 
 #if __TBB_USE_ITT_NOTIFY
 //! Defined in profiling.cpp
@@ -47,7 +49,8 @@ typedef std::size_t stack_size_type;
 class governor {
 private:
     friend class __TBB_InitOnce;
-    friend class market;
+    friend class thread_dispatcher;
+    friend class threading_control_impl;
 
     // TODO: consider using thread_local (measure performance and side effects)
     //! TLS for scheduler instances associated with individual threads
